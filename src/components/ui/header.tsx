@@ -6,8 +6,8 @@ const Navbar = () => {
   const [activeTab, setActiveTab] = React.useState('jobs');
 
   const navItems = [
-    { id: 'jobs', label: 'Find Jobs' },
-    { id: 'hiring', label: 'Hiring' },
+    { id: 'jobs', label: 'Post A Project' },
+    { id: 'About Us', label: 'Comunity' },
     { id: 'faq', label: 'FAQ' },
   ];
 

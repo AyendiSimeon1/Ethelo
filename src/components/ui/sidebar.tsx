@@ -7,9 +7,9 @@ export default function Sidebar() {
     return (
         <div className="space-y-6">
             
-            <div className="p-6 bg-white rounded-lg shadow-md">
-                <h2 className="text-lg font-semibold mb-2">Random Card</h2>
-                <p className="text-gray-600">This is a placeholder for any.</p>
+            <div className="p-6 bg-black text-white rounded-lg shadow-md">
+                <h2 className="text-lg font-semibold mb-2">Find Oppurtunuies</h2>
+                <button className="text-gray-600">Learn More</button>
             </div>
 
 

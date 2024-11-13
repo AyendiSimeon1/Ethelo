@@ -10,6 +10,7 @@ type Stats = {
 
 const Hero: React.FC = () => {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const categories = ['All', 'UI/UX Designer', 'Motion Designer', 'Graphic Designer', 'Web Developer'];
 
   const stats: Stats[] = [
     { value: '1,000+', label: 'Opportunities' },
@@ -35,7 +36,7 @@ const Hero: React.FC = () => {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl font-extrabold text-gray-900 tracking-tight leading-tight"
+              className="text-5xl font-extrabold font-mono animate-slide-in delay-200 text-gray-900 tracking-tight leading-tight"
             >
               Make a <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-500">Difference</span> in Your Community
             </motion.h1>
@@ -79,31 +80,20 @@ const Hero: React.FC = () => {
             </div>
           </motion.form>
 
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex gap-16 pt-4"
-          >
-            {stats.map((stat, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="text-center"
-              >
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-                  {stat.value}
-                </div>
-                <div className="text-base font-medium text-gray-600 mt-1">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          
         </motion.div>
       </div>
+      <div className="mb-6 flex flex-wrap gap-4 justify-center items-center">
+                {categories.map((category) => (
+                    <button
+                        key={category}
+                        
+                        className='px-4 py-2 rounded-lg font-mono transition-colors duration-200'
+                    >
+                        {category}
+                    </button>
+                ))}
+            </div>
     </div>
   );
 };
