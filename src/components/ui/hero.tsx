@@ -3,20 +3,12 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-type Stats = {
-  value: string;
-  label: string;
-}
 
 const Hero: React.FC = () => {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const categories = ['All', 'UI/UX Designer', 'Motion Designer', 'Graphic Designer', 'Web Developer'];
 
-  const stats: Stats[] = [
-    { value: '1,000+', label: 'Opportunities' },
-    { value: '500+', label: 'Organizations' },
-    { value: '10k+', label: 'Volunteers' },
-  ];
+  
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
