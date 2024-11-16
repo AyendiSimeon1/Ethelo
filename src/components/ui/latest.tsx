@@ -45,7 +45,7 @@ export default function LatestJobs() {
     ];
 
     return (
-        <section className="p-6 bg-gray-50">
+        <section className="p-6 bg-gray-50  mx-8 rounded-lg">
             <h2 className="text-2xl font-semibold font-mono mb-6">Latest Projects</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {jobs.map((job) => (

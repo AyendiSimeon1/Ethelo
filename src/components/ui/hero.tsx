@@ -1,13 +1,24 @@
 "use client";
 import React from 'react';
-import { Search } from 'lucide-react';
+
 import { motion } from 'framer-motion';
+import { 
+  Briefcase, 
+  Code, 
+  Search,
+  Palette, 
+  LineChart, 
+  Server,
+ 
+} from 'lucide-react'
+
+import  Cat  from '@/components/card/CategoryData';
 
 
-const Hero: React.FC = () => {
+
+const Hero: React.FC =  () => {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const categories = ['All', 'UI/UX Designer', 'Motion Designer', 'Graphic Designer', 'Web Developer'];
-
+ 
   
 
   const handleSearch = (e: React.FormEvent) => {
@@ -75,17 +86,10 @@ const Hero: React.FC = () => {
           
         </motion.div>
       </div>
-      <div className="mb-6 flex flex-wrap gap-4 justify-center items-center">
-                {categories.map((category) => (
-                    <button
-                        key={category}
-                        
-                        className='px-4 py-2 rounded-lg font-mono transition-colors duration-200'
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
+       <Cat />
+
+   
+
     </div>
   );
 };

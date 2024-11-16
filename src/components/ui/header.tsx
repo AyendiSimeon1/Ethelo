@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import React from 'react';
 import { Bell, Navigation, Settings, User } from 'lucide-react';
 
@@ -7,7 +8,7 @@ const Navbar = () => {
 
   const navItems = [
     { id: 'jobs', label: 'Post A Project' },
-    { id: 'About Us', label: 'Comunity' },
+    { id: 'About ', label: 'About' },
     { id: 'faq', label: 'FAQ' },
   ];
 
@@ -17,14 +18,14 @@ const Navbar = () => {
         <div className="h-16 flex items-center justify-between">
        
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-              <span className="text-white font-bold"><Navigation /></span>
+            <div className="w-8 h-8 bg-blue-500 p-3 rounded-md flex items-center justify-center">
+              <span className="text-white p-2 font-bold"><Navigation /></span>
             </div>
-            <span className="text-white font-bold text-xl font-mono">Ethelo</span>
+            <span className="text-white font-bold text-2xl font-mono">Ethelo</span>
           </div>
 
      
-          <div className="flex items-center space-x-8 font-mono font-semi-bold">
+          <div className="flex items-center space-x-8 text-xl font-mono font-semi-bold">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -42,7 +43,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
+            {/* <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
               <Bell size={20} />
             </button>
             <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
@@ -50,7 +51,14 @@ const Navbar = () => {
             </button>
             <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
               <User size={20} />
-            </button>
+            </button> */}
+            <Link href='/signup'>
+              <button 
+                className='text-white bg-blue-700 px-3 font-mono py-2  rounded'
+                >
+                  Signup
+                </button>
+              </Link>
           </div>
         </div>
       </div>
