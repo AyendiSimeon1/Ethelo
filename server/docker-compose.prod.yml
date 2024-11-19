@@ -9,7 +9,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=mongodb://db:27017/myapp
+      - DATABASE_URL=mongodb+srv://mrayendi1:19Ana156@cluster0.i1s4gt1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
     depends_on:
       - db
     restart: unless-stopped
