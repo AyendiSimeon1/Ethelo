@@ -16,13 +16,7 @@ services:
       - db
     command: npm run dev  # Assuming you have a dev script with nodemon
 
-  # Database (MongoDB example)
-  db:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+ 
 
   # Redis for caching
   redis:
