@@ -52,6 +52,17 @@ export const Login = createAsyncThunk(
     }
 );
 
+export const verifyUser = createAsyncThunk(
+    'auth/verifyUser',
+    async (_, { rejectWithValue }) => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+    }
+  );
+  
+
 const authSlce = createSlice({
     name: 'auth',
     initialState,
@@ -72,5 +83,33 @@ const authSlce = createSlice({
             state.error = action.error as string,
             state.isLoading = false
         });
+        builder.addCase(Login.pending, (state) => {
+            state.isLoading = true,
+            state.error = null  
+
+        });
+        builder.addCase(Login.fulfilled, (state, action) => {
+            state.isLoading = false,
+            state.user = action.payload,
+            state.error = null,
+            state.isAuthenticated = true
+        });
+        builder.addCase(Login.rejected, (state, action) => {
+            state.isAuthenticated= false,
+            state.error = action.error as string,
+            state.isLoading = false
+        });
+        builder.addCase(verifyUser.fulfilled, (state, action) => {
+            state.isAuthenticated = true;
+            state.isLoading = false;
+          });
+          builder.addCase(verifyUser.rejected, (state) => {
+            state.user = null;
+            state.isAuthenticated = false;
+            state.isLoading = false;
+            localStorage.removeItem('authToken');
+          });
     } 
-})
+});
+
+export default authSlce.reducer;

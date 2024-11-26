@@ -1,10 +1,10 @@
 "use client";
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import React, { FormEvent } from 'react';
 import { FaGoogle } from "react-icons/fa";
 
 export default function Signup () {
-    // const router = useRouter();
+    const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -69,5 +69,9 @@ export default function Signup () {
             </div>
         </div>
     )
+}
+
+function useAppSelector(arg0: (state: any) => any): { isLoading: any; error: any; isAuthenticated: any; } {
+    throw new Error('Function not implemented.');
 }
 
