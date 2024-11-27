@@ -1,15 +1,36 @@
 "use client";
-// import { useRouter } from 'next/router';
-import React, { FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { FormEvent, useEffect, useState  } from 'react';
+import { ClipLoader } from 'react-spinners';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { LoginUser } from '@/redux/authReducer';
 
 
 export default function Login () {
-    // const router = useRouter();
+    const router = useRouter();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+;    const dispatch = useAppDispatch();
+    const { isLoading, isAuthenticated, error } = useAppSelector((state) => state.auth);
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        console.log('Form submitted');
+    useEffect(() => {
+        if(isAuthenticated) {
+            router.push('/dashboard');
         }
+    }, [isAuthenticated, router]);
+
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await dispatch(LoginUser({ email, password }))
+            if (LoginUser.fulfilled.match(response)) {
+                console.log('Signup succesul', response);
+            }
+        } catch (error) {
+            console.log('failed');
+        }
+    }
     return  (
         <div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
             <div className='bg-white shadow-lg rounded-lg p-8 w-full max-w-md'>
@@ -25,6 +46,8 @@ export default function Login () {
                         <input 
                             type='text'
                             id='Email'
+                            value = {email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
                             placeholder='Enter your email address'
                             required
@@ -37,6 +60,8 @@ export default function Login () {
                         <input
                             type='password'
                             id='password'
+                            value = {password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className='shadow appearance border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none'
                             placeholder='Enter a password'
                             required
@@ -44,9 +69,10 @@ export default function Login () {
                     </div>
                     <button 
                         type='submit'
-                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus: outline-none focus: shadow-none'
+                        className='bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-3 rounded focus: outline-none focus: shadow-none'
                         >
-                            Create an account
+                            { isLoading ? <ClipLoader size={15}/> : 'Login'}
+                            
                         </button>
 
                 </form>
