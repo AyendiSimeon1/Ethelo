@@ -1,14 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 30
-  },
   email: {
     type: String,
     required: true,
@@ -23,18 +16,18 @@ const userSchema = new mongoose.Schema({
     minlength: 8
   },
   profile: {
-    firstName: {
-      type: String,
-      trim: true
-    },
-    lastName: {
-      type: String,
-      trim: true
-    },
-    avatar: {
-      type: String,
-      default: 'default-avatar.png'
-    }
+    // firstName: {
+    //   type: String,
+    //   trim: true
+    // },
+    // lastName: {
+    //   type: String,
+    //   trim: true
+    // },
+    // avatar: {
+    //   type: String,
+    //   default: 'default-avatar.png'
+    // }
   },
   isActive: {
     type: Boolean,
@@ -59,14 +52,14 @@ const userSchema = new mongoose.Schema({
 });
 
 
-userSchema.virtual('fullName').get(function() {
-  return `${this.profile.firstName} ${this.profile.lastName}`;
-});
+// userSchema.virtual('email').get(function() {
+//   return `${this.firstName}`;
+// });
 
 
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  // this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 

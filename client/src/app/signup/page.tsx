@@ -1,18 +1,46 @@
 "use client";
-import { useRouter } from 'next/router';
-import React, { FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, FormEvent } from 'react';
 import { FaGoogle } from "react-icons/fa";
+import { SignupUser  } from '../../redux/authReducer';
+import {  useAppDispatch, useAppSelector } from '../../redux/store';
+import { ClipLoader } from 'react-spinners';
 
 export default function Signup () {
+    const router = useRouter();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
-
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        console.log('Form submitted');
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        if(isAuthenticated) {
+            router.push('/dashboard');
         }
+    }, [isAuthenticated, router]);
+
+    const handleSubmit =  async (e: FormEvent) => {
+        e.preventDefault();
+        
+        try {
+            const resultAction = await dispatch(SignupUser({ email, password }));
+            if (SignupUser.fulfilled.match(resultAction)) {
+                console.log('Signup successful', resultAction.payload);
+            } else {
+                console.error('Signup failed');
+            }
+        } catch (error) {
+            console.error('Signup error', error);
+        }
+    }
     return  (
         <div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
             <div className='bg-white shadow-lg rounded-lg p-8 w-full max-w-md'>
+            {error && 
+                <div className='bg-red-500 text-center text-white p-2 m-2 shadow-lg transform transition-transform translate-y-0 opacity-100 rounded'>
+                <p>{error}</p>
+                </div>
+                }
+                
                 <h1 className='text-2xl font-bold mb-4 text-blue-500'>Ethelo</h1>
                 <p className='text-gray-600 mb-6'>
                     Join our community and make a difference with your volunteering efforts
@@ -25,6 +53,8 @@ export default function Signup () {
                         <input 
                             type='text'
                             id='Email'
+                            value = {email}
+                            onChange = {(e) => setEmail(e.target.value)}
                             className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
                             placeholder='Enter your email address'
                             required
@@ -37,6 +67,8 @@ export default function Signup () {
                         <input
                             type='password'
                             id='password'
+                            value = {password}
+                            onChange = {(e) => setPassword(e.target.value)}
                             className='shadow appearance border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none'
                             placeholder='Enter a password'
                             required
@@ -44,9 +76,11 @@ export default function Signup () {
                     </div>
                     <button 
                         type='submit'
-                        className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus: outline-none focus: shadow-none'
+                        className='bg-blue-600 text-center w-full hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus: outline-none focus: shadow-none'
                         >
-                            Create an account
+                            <div>
+                             { isLoading ? <ClipLoader size={15}/> : <p>Create an account</p>}
+                             </div>
                         </button>
 
                 </form>
@@ -65,13 +99,11 @@ export default function Signup () {
                 </div>
             </div>
             <div className='mt-8 text-gray-600'>
+               
                 <p>Already have an account ? <a href='/login' className='text-gray-800'>Sign in</a></p>
             </div>
         </div>
     )
 }
 
-function useAppSelector(arg0: (state: any) => any): { isLoading: any; error: any; isAuthenticated: any; } {
-    throw new Error('Function not implemented.');
-}
 
