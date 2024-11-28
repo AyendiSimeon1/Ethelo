@@ -5,21 +5,39 @@ import { FaGoogle } from "react-icons/fa";
 import { SignupUser  } from '../../redux/authReducer';
 import {  useAppDispatch, useAppSelector } from '../../redux/store';
 import { ClipLoader } from 'react-spinners';
+import { validateForm } from '@/utils/authValidation';
+
 
 export default function Signup () {
     const router = useRouter();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [validationErrors, setValidationErrors] = useState({});
     const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+    console.log(isAuthenticated);
     const dispatch = useAppDispatch();
     useEffect(() => {
         if(isAuthenticated) {
-            router.push('/dashboard');
+            router.push('/profile');
         }
     }, [isAuthenticated, router]);
 
+
+
     const handleSubmit =  async (e: FormEvent) => {
         e.preventDefault();
+        
+        // const formValidation = validateForm(email, password);
+
+        // if(Object.keys(formValidation).length > 0) {
+        //     setValidationErrors(formValidation);
+
+        //     setEmail('');
+
+        //     setPassword('');
+        // }
+        
+        
         
         try {
             const resultAction = await dispatch(SignupUser({ email, password }));
@@ -35,9 +53,14 @@ export default function Signup () {
     return  (
         <div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
             <div className='bg-white shadow-lg rounded-lg p-8 w-full max-w-md'>
+                {/* <div>
+            {validationErrors && <p className="text-red-500">{validationErrors.name}
+
+                </div> */}
             {error && 
                 <div className='bg-red-500 text-center text-white p-2 m-2 shadow-lg transform transition-transform translate-y-0 opacity-100 rounded'>
                 <p>{error}</p>
+                
                 </div>
                 }
                 

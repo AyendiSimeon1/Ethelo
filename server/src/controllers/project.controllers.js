@@ -1,4 +1,53 @@
-const Project = require('../models/project.models');
+const { Project, Category } = require('../models/project.models');
+
+export const createCategory = async (req, res) => {
+
+    const { formData }= req.body;
+    const title = formData.title;
+
+    try {
+        existingCategory = await Category.find({ title });
+
+        if(existingCategory) {
+            return res.status(400).json({ success: false, message: 'Category with this title already exists'});
+        };
+
+        const category = new Category({
+            formData
+        });
+
+        category.save();
+
+        return res.status(201).json({
+            succe: true,
+            data: formData,
+            message: 'Category created succesfully'
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error'
+        });
+    }
+};
+
+export const getAllCategories = async (req, res) => {
+
+    try {
+        const categories = Category.find();
+        return res.status(200).json({
+            success: true,
+            data: categories,
+        });
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error'
+        });
+    }
+};
 
 export const getAllProjects = async (req, res) => {
 
@@ -20,14 +69,6 @@ export const getAllProjects = async (req, res) => {
 export const createProject = async (req, res) => {
     try {
         const { data } = req.body;
-        const { error, value} = validate(data);
-
-        if(error) {
-            res.status(400).json({
-                success: false,
-                message: error?.message
-            });
-        }
 
         const newProject = await new Project({
             data

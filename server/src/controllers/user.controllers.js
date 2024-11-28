@@ -3,15 +3,8 @@ const bcrypt = require('bcryptjs');
 const { generateToken } = require('../middlewares/auth');
 
 const signup = async (req, res) => {
-    // const { error, value } = userSchema.validate(req.body);
-    // if(error) {
-    //     return res.status(400).json({ success: false, message: error });
-    // }
     const { email, password } = req.body;
-    console.log([email, password]);
-
     try {
-       
         const existingUser = await User.findOne({ email });
         console.log('hi', existingUser);
         if (existingUser) {
@@ -24,17 +17,13 @@ const signup = async (req, res) => {
             email,
             password: hashedPassword
         });
-
-        
         await newUser.save();
         const token = generateToken(newUser._id);
         return res.status(201).json({
             success: true,
             data: newUser,
-            token
-            
+            token      
         });
-
     } catch (error) {
         res.status(500).json({ succes: false, message: error.message || 'Internal server error' });
     }

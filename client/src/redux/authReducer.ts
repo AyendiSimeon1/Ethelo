@@ -4,7 +4,7 @@ import axios from 'axios';
 import { RootStateInterface } from './store';
 dotenv.config();
 
-const baseUrl = "http://localhost:3000";
+const baseUrl = "http://localhost:4000";
 console.log(baseUrl);
 
 export interface User {
@@ -41,6 +41,7 @@ export const SignupUser = createAsyncThunk<
     'auth/signup',
     async (userData, { rejectWithValue }) => {
         try {
+            console.log('userdata', userData);
             const response = await axios.post(`${baseUrl}/auth/signup`, userData);
             return response.data as User;
         } catch (error: any) {

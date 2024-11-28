@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Footer from '../../components/ui/footer';
 import { 
   User, Mail, Briefcase, MapPin, Calendar, Edit2, 
   Bell, Check, X, ExternalLink, Github, Linkedin,
@@ -7,23 +8,15 @@ import {
 } from 'lucide-react';
 import { NotificationType, ProjectType, UserInfoType } from '@/types/Profile';
 import { div } from 'framer-motion/client';
+import { useAppSelector } from '../../redux/store';
 
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState<'projects' | 'applications' | 'accepted'>('projects');
   const [isEditing, setIsEdititng] = useState(false);
-  const [showNotification, setShowNotification] = useState(true);
-
-  const [userInfo, setUserInfo] = useState<UserInfoType>({
-    name: "Sarah Anderson",
-    title: "Full Stack Developer",
-    location: "San Francisco, CA",
-    email: "sarah.anderson@example.com",
-    bio: "Passionate developer with 5+ years of experience in web technologies. Love contributing to open-source projects and mentoring new developers.",
-    skills: ["React", "Node.js", "Python", "AWS", "TypeScript"],
-    github: "github.com/sarahand",
-    website: "sarahanderson.dev",
-  });
+  const [showNotification, setShowNotification] = useState(false);
+  const { isLoading, isAuthenticated, error, user } = useAppSelector((state) => state.auth);
+  console.log('user is ', user);
 
   const projects: ProjectType[] = [
     {
@@ -75,12 +68,13 @@ const UserProfile = () => {
   });
 
   return (
-    <div className="min-h-screnn bg-gray-50">
+    
+    <div className="min-h-screnn bg-gray-50 min-h-screen">
       <div className="bg-white shadow-sm-sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex-1">
-              <h1 className="text-xl font-bold">{userInfo.name}</h1>
+              <h1 className="text-xl font-bold">My Dashboard</h1>
             </div>
             <button
               onClick={() => setShowNotification(!showNotification)}
@@ -94,6 +88,8 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
+      {showNotification ? (
+            <div>
       <div className="fixed right-0 mt-2 bg-white rounded-lg shadow-xl z-50 mr-10">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
@@ -105,6 +101,7 @@ const UserProfile = () => {
               
             </button>
           </div>
+          
           {notifications.map((notification) => (
               <div
                 key={notification.id}
@@ -127,27 +124,28 @@ const UserProfile = () => {
                 </div>
               </div>
             ))}
-        </div>
-      </div>
+            </div> 
+        </div> 
+      </div> ) : ('' )}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* User Info */}
         <div className="flex flex-col space-y-4 mb-6">
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <User className="h-6 w-6 text-gray-600" />
             <p className="text-lg font-semibold">{userInfo.name}</p>
-          </div>
+          </div> */}
           <div className="flex items-center space-x-4">
             <Mail className="h-6 w-6 text-gray-600" />
-            <p>{userInfo.email}</p>
+            <p>{user?.user?.email}</p>
           </div>
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <MapPin className="h-6 w-6 text-gray-600" />
             <p>{userInfo.location}</p>
-          </div>
+          </div> */}
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-4 border-b pb-2 mb-4">
+        <div className="flex space-x-4 justify-between border-b pb-2 mb-4">
           <button
             className={`${
               activeTab === "projects" ? "font-bold text-blue-600" : "text-gray-600"
@@ -190,10 +188,15 @@ const UserProfile = () => {
             </div>
           ))}
         </div>
+        {/* <Footer /> */}
       </div>
+     
     </div>
+    
+     
+     
 
-
+  
   )
 }
 

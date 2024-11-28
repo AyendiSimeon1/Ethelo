@@ -1,49 +1,50 @@
-// redux/store.ts
 import { 
     configureStore, 
     ThunkAction, 
-    Action, 
-    Middleware,
-    
-    UnknownAction,
-    AnyAction
+    Action,
+    combineReducers, 
 } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import authReducer from './authReducer';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
-// Define reducers separately to break circular reference
+const persistConfig = {
+    key: 'root',
+    storage,
+};
+
 const rootReducer = {
     auth: authReducer,
 };
 
-// Explicitly type the store configuration
+const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));
+
 export const store = configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) => 
         getDefaultMiddleware({
             serializableCheck: {
-                // Ignore specific action types if needed
-                ignoredActions: []
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             }
         })
 });
 
-// Define RootState using a type instead of typeof
 export interface RootStateInterface {
     auth: ReturnType<typeof authReducer>;
 }
 
-// Typed versions of useDispatch and useSelector
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootStateInterface> = useSelector;
 
-// Define AppDispatch type
 export type AppDispatch = typeof store.dispatch;
 
-// Define ThunkAction type for async operations
 export type AppThunk<ReturnType = void> = ThunkAction<
     ReturnType,
     RootStateInterface,
     unknown,
     Action
 >;
+
+export const persistor = persistStore(store);

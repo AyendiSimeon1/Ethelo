@@ -12,10 +12,11 @@ export default function Login () {
     const [password, setPassword] = useState<string>('');
 ;    const dispatch = useAppDispatch();
     const { isLoading, isAuthenticated, error } = useAppSelector((state) => state.auth);
+    console.log(isAuthenticated);
 
     useEffect(() => {
         if(isAuthenticated) {
-            router.push('/dashboard');
+            router.push('/profile');
         }
     }, [isAuthenticated, router]);
 
