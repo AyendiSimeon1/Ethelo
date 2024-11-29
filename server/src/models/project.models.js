@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const CategorySchema = new mongoose.Schmema({
-    name : {
+const CategorySchema = new mongoose.Schema({
+    title : {
         type: String,
         required: true,
         trim: true
@@ -21,6 +21,7 @@ const CategorySchema = new mongoose.Schmema({
     },
 });
 
+
 const Category = mongoose.model('Category', CategorySchema);
 
 const ProjectSchema = new mongoose.Schema({
@@ -35,7 +36,7 @@ const ProjectSchema = new mongoose.Schema({
         trim: true
     },
     categoryId : {
-        type: mongoose.Schema.types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true,
     },

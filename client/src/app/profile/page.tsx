@@ -136,7 +136,7 @@ const UserProfile = () => {
           </div> */}
           <div className="flex items-center space-x-4">
             <Mail className="h-6 w-6 text-gray-600" />
-            <p>{user?.user?.email}</p>
+            {/* <p>{user?.user?.email}</p> */}
           </div>
           {/* <div className="flex items-center space-x-4">
             <MapPin className="h-6 w-6 text-gray-600" />

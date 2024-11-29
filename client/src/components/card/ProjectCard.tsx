@@ -1,17 +1,18 @@
 "use client";
 import Link from 'next/link';
-import { JobPosting } from '@/types/category';
+
 
 import {
     Building2,
     MapPin,
     Clock,
-    Calender,
+   
     Briefcase,
     ChevronRight
 } from 'lucide-react';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from 'react';
 
-export function JobCard({ job }: { job: JobPosting }) {
+export function JobCard({ job }: { job: any }) {
     // Function to format the posted date to "X days ago"
     const getTimeAgo = (dateString: string) => {
       const now = new Date()
@@ -77,7 +78,7 @@ export function JobCard({ job }: { job: JobPosting }) {
               <span>{job.experienceLevel}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
-              <Calendar className="w-4 h-4" />
+             
               <span>{getTimeAgo(job.postedDate)}</span>
             </div>
           </div>
@@ -89,7 +90,7 @@ export function JobCard({ job }: { job: JobPosting }) {
   
           {/* Skills section */}
           <div className="flex flex-wrap gap-2">
-            {job.skills.map((skill, index) => (
+            {job.skills.map((skill: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, index: Key | null | undefined) => (
               <span 
                 key={index}
                 className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
@@ -111,12 +112,9 @@ export function JobCard({ job }: { job: JobPosting }) {
     )
   }
   
-  // Example usage in a page:
-  // app/categories/[category]/page.tsx
-  import { JobCard } from '@/components/JobCard'
-  
+
   // Example job data
-  const exampleJob: JobPosting = {
+  const exampleJob: any = {
     id: "1",
     title: "Senior Product Designer",
     company: "DesignCo",

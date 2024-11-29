@@ -1,26 +1,33 @@
 const { Project, Category } = require('../models/project.models');
 
-export const createCategory = async (req, res) => {
 
-    const { formData }= req.body;
-    const title = formData.title;
 
+
+const createCategory = async (req, res) => {
+
+    const { title, slug, description, icon }= req.body;
+ 
     try {
-        existingCategory = await Category.find({ title });
+        const existingCategory = await Category.find({ title });
+        console.log(
+            'this', existingCategory.length);
 
-        if(existingCategory) {
+        if(existingCategory > 0) {
             return res.status(400).json({ success: false, message: 'Category with this title already exists'});
         };
 
-        const category = new Category({
-            formData
+        const newCategory = await new Category({
+            title,
+            slug,
+            description,
+            icon
         });
 
-        category.save();
+        await newCategory.save();
 
         return res.status(201).json({
             succe: true,
-            data: formData,
+            data: newCategory,
             message: 'Category created succesfully'
         });
 
@@ -32,10 +39,10 @@ export const createCategory = async (req, res) => {
     }
 };
 
-export const getAllCategories = async (req, res) => {
+const getAllCategories = async (req, res) => {
 
     try {
-        const categories = Category.find();
+        const categories = await Category.find({});
         return res.status(200).json({
             success: true,
             data: categories,
@@ -49,7 +56,7 @@ export const getAllCategories = async (req, res) => {
     }
 };
 
-export const getAllProjects = async (req, res) => {
+const allProjects = async (req, res) => {
 
     try {
         const projects = await Project.find();
@@ -66,12 +73,28 @@ export const getAllProjects = async (req, res) => {
     }
 }
 
-export const createProject = async (req, res) => {
+const createProject = async (req, res) => {
     try {
-        const { data } = req.body;
+        const { 
+            title,
+            description,
+            categoryId,
+            organizationName,
+            location,
+            requiredSkills,
+            contactEmail,
+            volunteerCount
+         } = req.body;
 
-        const newProject = await new Project({
-            data
+        const newProject = new Project({
+            title,
+            description,
+            categoryId,
+            organizationName,
+            location,
+            requiredSkills,
+            contactEmail,
+            volunteerCount
         });
         return res.status(201).json({
             success: true,
@@ -87,13 +110,22 @@ export const createProject = async (req, res) => {
 
 }
 
-export const updateProject = async (req, res) => {
+const updateProject = async (req, res) => {
     try {
-        const { data } = req.body;
+        const {
+            title,
+            description,
+            categoryId,
+            organizationName,
+            location,
+            requiredSkills,
+            contactEmail,
+            volunteerCount
+         } = req.body;
 
-        req.query = { projectId };
+       
 
-        const checkProject = await Project.find({ projectId });
+        const checkProject = await Project.find({ title });
         if(!checkProject) {
             return res.status(400).json({
                 success: false,
@@ -118,7 +150,7 @@ export const updateProject = async (req, res) => {
     
 };
 
-export const deleteProject = async (req, res) => {
+const deleteProject = async (req, res) => {
     const { projectId } = req.query;
 
     const checkProject = await Project.find({ projectId });
@@ -135,3 +167,11 @@ export const deleteProject = async (req, res) => {
     });
 };
 
+module.exports = {
+    createCategory,
+    getAllCategories,
+    createProject,
+    deleteProject,
+    updateProject,
+    allProjects
+}
