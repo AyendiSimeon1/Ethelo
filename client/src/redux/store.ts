@@ -9,6 +9,7 @@ import authReducer from './authReducer';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import categoryReducer from './categoryReducer';
 
 const persistConfig = {
     key: 'root',
@@ -17,6 +18,7 @@ const persistConfig = {
 
 const rootReducer = {
     auth: authReducer,
+    category: categoryReducer
 };
 
 const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));
@@ -32,6 +34,7 @@ export const store = configureStore({
 });
 
 export interface RootStateInterface {
+    [x: string]: any;
     auth: ReturnType<typeof authReducer>;
 }
 

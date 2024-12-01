@@ -14,8 +14,6 @@ const Jumbotron = () => {
     return (
     <div className='relative bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden'>
         <div className='absolute inset-0 opacity-10'>
-          {/* <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"20\" height=\"20\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M0 0h20v20H0z\" fill=\"%23FFFFFF\" fill-opacity=\"0.2\"/%3E%3C/svg%3E')] bg-repeat" /> */}
-
             </div>
             <div className='absolute inset-0 overflow-hidden'>
                 <div className='animate-float-medium absolute top-40 right-20'>

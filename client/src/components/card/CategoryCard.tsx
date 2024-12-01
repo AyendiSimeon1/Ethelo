@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Palette, Code, TrendingUp, Briefcase } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/redux/store';
+import { getCategories } from '@/redux/categoryReducer';
 
-// Type definition for our category data
 type Category = {
   id: string;
   name: string;
@@ -17,31 +18,25 @@ const iconMapping = {
   'trending-up': TrendingUp,
   briefcase: Briefcase,
 };
+const CategoryCard = () => {
+  const dispatch = useAppDispatch();
+  const { data: categories = [], isLoading, error } = useAppSelector((state) => state.category);
 
-const CategoryCard = ({ category }: { category: Category }) => {
-  const IconComponent = iconMapping[category.icon as keyof typeof iconMapping];
+  useEffect(() => {
+    dispatch(getCategories());
+  }, [dispatch]);
+
+  if (isLoading) return <p>Loading categories...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
-    
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            {IconComponent && (
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <IconComponent className="h-5 w-5 text-blue-600" />
-              </div>
-            )}
-            <h3 className="text-xl font-semibold text-gray-900">{category.name}</h3>
-          </div>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-            {category.count} items
-          </span>
+    <div>
+      {categories.map((category: { _id: React.Key | null | undefined; title: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => (
+        <div key={category._id} className="category-card">
+          <h3>{category.title}</h3>
+          <p>{category.description}</p>
         </div>
-        <p className="text-sm text-gray-500">
-          {category.description}
-        </p>
-      </div>
+      ))}
     </div>
   );
 };

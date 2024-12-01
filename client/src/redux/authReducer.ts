@@ -13,7 +13,7 @@ export interface User {
     password?: string;
 }
 
-// Authentication state interface
+
 export interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
@@ -21,7 +21,7 @@ export interface AuthState {
     error: string | null;
 }
 
-// Initial state
+
 const initialState: AuthState = {
     user: null,
     isAuthenticated: false,
