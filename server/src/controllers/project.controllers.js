@@ -82,6 +82,7 @@ const createProject = async (req, res) => {
             organizationName,
             location,
             requiredSkills,
+            duration,
             contactEmail,
             volunteerCount
          } = req.body;
@@ -93,9 +94,13 @@ const createProject = async (req, res) => {
             organizationName,
             location,
             requiredSkills,
+            duration,
             contactEmail,
             volunteerCount
         });
+
+        await newProject.save();
+
         return res.status(201).json({
             success: true,
             data: newProject 
@@ -104,7 +109,7 @@ const createProject = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: error?.messagee
+            message: error
         });
     }
 
@@ -119,6 +124,7 @@ const updateProject = async (req, res) => {
             organizationName,
             location,
             requiredSkills,
+            duration,
             contactEmail,
             volunteerCount
          } = req.body;

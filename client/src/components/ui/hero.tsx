@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import CategoryCard from '@/components/card/CategoryCard';
 
 import { motion } from 'framer-motion';
 import { 
@@ -86,7 +87,7 @@ const Hero: React.FC =  () => {
           
         </motion.div>
       </div>
-       <Cat />
+       <CategoryCard />
 
    
 

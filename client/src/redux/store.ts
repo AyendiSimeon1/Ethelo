@@ -10,7 +10,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import categoryReducer from './categoryReducer';
-
+import projectReducer from './productReducer';
 const persistConfig = {
     key: 'root',
     storage,
@@ -18,7 +18,8 @@ const persistConfig = {
 
 const rootReducer = {
     auth: authReducer,
-    category: categoryReducer
+    category: categoryReducer,
+    project: projectReducer
 };
 
 const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));
