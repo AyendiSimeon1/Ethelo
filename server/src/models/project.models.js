@@ -38,11 +38,11 @@ const ProjectSchema = new mongoose.Schema({
     categoryId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true,
+        required: false,
     },
     organizationName: { type: String },
     location: { type: String },
-    duration: { type: String, required: true },
+    duration: { type: String, required: false },
     requiredSkills : {
         type: [String],
         required: true

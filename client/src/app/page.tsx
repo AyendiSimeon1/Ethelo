@@ -13,7 +13,7 @@ export default function Home() {
       
       
         <RecommendedJobs />
-        <LatestJobs />
+        {/* <LatestJobs /> */}
         <Jumbotron />
         
 

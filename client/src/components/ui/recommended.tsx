@@ -23,6 +23,7 @@ export default function RecommendedJobs() {
             }
         };
         fetchProjects();
+        
     }, [dispatch]);
     console.log('The projects:', projects);
 
@@ -31,17 +32,17 @@ export default function RecommendedJobs() {
     
 
     return (
-        <section className="p-6 bg-gray-50 mb-8 mx-8 rounded-lg mt-8">
+        <section className="p-6  bg-bl mb-8 mx-8 rounded-lg mt-8">
             <h2 className="text-2xl font-semibold font-mono mb-6">Recommended Projects</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {allProjects.map((project: Project) => (
                     <div
-                        key={project.id}
-                        className={`bg-gray-400 p-6 rounded-lg shadow-md transform transition duration-200 hover:scale-105`}
+                     
+                        className={`bg-blue-300 p-6 rounded-lg shadow-md transform transition duration-200 hover:scale-105`}
                     >
                         {/* <div className="text-sm text-gray-500 font-mono mb-2">{job.date}</div> */}
                         <h3 className="text-lg font-bold text-gray-800 font-mono">{project.title}</h3>
-                        <p className="text-sm text-gray-700 font-mono">{project.organizationName}</p>
+                        <p className="text-sm text-white font-mono">{project.organizationName}</p>
                         <div className="my-4 space-y-2">
                             {/* {project.requiredSkills.map((tag, index) => (
                                 <span

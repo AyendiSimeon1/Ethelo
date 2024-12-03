@@ -25,7 +25,7 @@ const Navbar = () => {
           </div>
 
      
-          <div className="flex items-center space-x-8 text-xl font-mono font-semi-bold">
+          <div className="hidden lg:flex items-center space-x-8 text-xl font-mono font-semi-bold">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -42,16 +42,8 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-4">
-            {/* <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
-              <Bell size={20} />
-            </button>
-            <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
-              <Settings size={20} />
-            </button>
-            <button className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition-colors">
-              <User size={20} />
-            </button> */}
+          <div className="hidden lg:flex items-center space-x-4">
+           
             <Link href='/signup'>
               <button 
                 className='text-white bg-blue-700 px-3 font-mono py-2  rounded'

@@ -4,16 +4,16 @@ import axios from 'axios';
 const baseUrl = "http://localhost:4000";
 
 export interface Project {
-    id: string;
-    title: string;
-    description: string;
-    categoryId: string;
-    organizationName: string;
-    location: string;
-    duration: string;
-    requiredSkills: string[];
-    contactEmail: string;
-    volunteerCount: string;
+    id?: string;
+    title?: string;
+    description?: string;
+    categoryId?: string;
+    organizationName?: string;
+    location?: string;
+    duration?: string;
+    requiredSkills?: string[];
+    contactEmail?: string;
+    volunteerCount?: number;
 }
 
 export interface ProjectState {
@@ -100,7 +100,8 @@ const projectSlice = createSlice({
             .addCase(createProject.fulfilled, (state, action) => {
                 state.isLoading = false;
                 if (state.projects) {
-                    state.projects.push(action.payload);
+                    console.log('Type of projects:', typeof state.projects);
+                    state.projects =  action.payload;
                 } else {
                     state.projects = [action.payload];
                 }
