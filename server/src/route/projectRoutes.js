@@ -1,5 +1,5 @@
 const express = require('express');
-const { createCategory, getAllCategories, allProjects, createProject, updateProject, deleteProject } = require('../controllers/project.controllers');
+const { createCategory, getProject, getAllCategories, allProjects, createProject, updateProject, deleteProject } = require('../controllers/project.controllers');
 const { authMiddleware } = require('../middlewares/auth');
 
 const projectRouter = express.Router();
@@ -10,7 +10,7 @@ projectRouter.get('/get-category', getAllCategories);
 
 projectRouter.get('/all-projects', allProjects);
 
-// projectRouter.get('/projects/:id/', getProject);
+projectRouter.get('/get-project/:projectId/', getProject);
 
 projectRouter.post('/create-project', createProject);
 

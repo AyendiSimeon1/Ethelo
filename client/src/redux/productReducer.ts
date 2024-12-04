@@ -99,12 +99,7 @@ const projectSlice = createSlice({
             })
             .addCase(createProject.fulfilled, (state, action) => {
                 state.isLoading = false;
-                if (state.projects) {
-                    console.log('Type of projects:', typeof state.projects);
-                    state.projects =  action.payload;
-                } else {
-                    state.projects = [action.payload];
-                }
+                state.projects = action.payload.data;
                 state.error = null;
             })
             .addCase(createProject.rejected, (state, action) => {
@@ -117,9 +112,9 @@ const projectSlice = createSlice({
             .addCase(updateProject.fulfilled, (state, action) => {
                 state.isLoading = false;
                 if (state.projects) {
-                    const index = state.projects.findIndex(project => project.title === action.payload.title);
+                    const index = state.projects.findIndex(project => project.id === action.payload.id);
                     if (index !== -1) {
-                        state.projects[index] = action.payload;
+                        state.projects[index] = action.payload.data; // Update the project in place
                     }
                 }
                 state.error = null;

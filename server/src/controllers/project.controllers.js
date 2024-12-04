@@ -77,6 +77,7 @@ const createProject = async (req, res) => {
     try {
         const { 
             title,
+            userId,
             description,
             categoryId,
             organizationName,
@@ -89,6 +90,7 @@ const createProject = async (req, res) => {
 
         const newProject = new Project({
             title,
+            userId,
             description,
             categoryId,
             organizationName,
@@ -119,6 +121,7 @@ const updateProject = async (req, res) => {
     try {
         const {
             title,
+            userId,
             description,
             categoryId,
             organizationName,
@@ -156,6 +159,33 @@ const updateProject = async (req, res) => {
     
 };
 
+const getProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        console.log('This is the project id :', projectId);
+
+        const project = await Project.findOne({ _id: projectId });
+
+        if (!project) {
+            return res.status(404).json({
+                success: false,
+                message: 'Project does not exist',
+            });
+        }
+
+
+        return res.status(200).json({
+            success: true,
+            data: project,
+        });
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+        });
+    }
+};
 const deleteProject = async (req, res) => {
     const { projectId } = req.query;
 
@@ -179,5 +209,6 @@ module.exports = {
     createProject,
     deleteProject,
     updateProject,
-    allProjects
+    allProjects,
+    getProject
 }

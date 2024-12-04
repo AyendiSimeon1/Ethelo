@@ -2,6 +2,7 @@
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect } from 'react';
 import { getProject, Project } from '@/redux/productReducer';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
+import Link from 'next/link';
 export default function RecommendedJobs() {
     const { projects, isLoading, error } = useAppSelector((state) => {
         return state.project;
@@ -55,9 +56,13 @@ export default function RecommendedJobs() {
                         </div>
                         {/* <div className="font-semibold text-gray-900 font-mono">{proj.pay}</div> */}
                         <div className="text-sm text-blue-200 font-mono">{project.location}</div>
+                        <Link href={`/projects/${project._id}`}>
                         <button className="mt-4 bg-black text-white py-1 px-4 rounded-lg text-sm font-mono transition duration-200 hover:bg-gray-800">
-                            Details
+                        
+                            Apply 
+                       
                         </button>
+                         </Link>
                     </div>
                 ))}
             </div>

@@ -7,6 +7,7 @@ import { title } from 'process';
 
 interface Project {
   title: string;
+  userId: string;
   description: string;
   categoryId: string;
   organizationName: string;
@@ -129,6 +130,11 @@ const ProjectPostingForm: React.FC = () => {
     console.log('🔍 Full Redux State:', state);
     return state.category;
   });
+  const userId = useAppSelector((state) => {
+    return state.auth.user?.user?.id;
+  });
+
+  console.log('This is the user id:', userId);
   
   const transformedCategories = categories.map((category: { id: string; title: string; }) => ({
     value: category.id,
@@ -137,6 +143,7 @@ const ProjectPostingForm: React.FC = () => {
  
   const [formData, setFormData] = useState<Project>({
     title: '',
+    userId: userId || '',
     description: '',
     categoryId: '',
     organizationName: '',

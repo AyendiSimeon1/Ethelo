@@ -57,10 +57,6 @@ const CategoryCard = () => {
     return <p>Loading categories...</p>;
   }
 
-  if (error) {
-    console.error('❌ Rendering Error State:', error);
-    return <p>Error: {error}</p>;
-  }
 
   console.log('🖼️ Rendering Categories:', categories);
 
