@@ -203,6 +203,43 @@ const deleteProject = async (req, res) => {
     });
 };
 
+const allApplications = async (req, res) => {
+    try {
+        const applications = await Application.find({ projectId: req.params.id });
+        res.json(applications);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching applications', error });
+    }
+};
+
+// Add a new application
+const createApplication = async (req, res) => {
+    try {
+        const { userName, userEmail, projectId } = req.body;
+        const newApplication = new Application({ userName, userEmail, projectId });
+        await newApplication.save();
+        res.status(201).json({ message: 'Application created', application: newApplication });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating application', error });
+    }
+};
+
+const updateApplication = async (req, res) => {
+    try {
+        const { action } = req.body;
+        const application = await Application.findById(req.params.id);
+        if (!application) {
+            return res.status(404).json({ message: 'Application not found' });
+        }
+        application.status = action === 'accept' ? 'Accepted' : 'Rejected';
+        await application.save();
+        res.json({ message: 'Application status updated', application });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating application', error });
+    }
+};
+
+
 module.exports = {
     createCategory,
     getAllCategories,
@@ -210,5 +247,8 @@ module.exports = {
     deleteProject,
     updateProject,
     allProjects,
-    getProject
+    getProject,
+    allApplications,
+    createApplication,
+    updateApplication
 }

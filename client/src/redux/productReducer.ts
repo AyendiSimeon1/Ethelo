@@ -4,6 +4,7 @@ import axios from 'axios';
 const baseUrl = "http://localhost:4000";
 
 export interface Project {
+    _id: any;
     id?: string;
     title?: string;
     description?: string;
@@ -75,6 +76,8 @@ export const deleteProject = createAsyncThunk(
         }
     }
 );
+
+
 
 const projectSlice = createSlice({
     name: 'project',

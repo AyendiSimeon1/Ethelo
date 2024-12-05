@@ -11,6 +11,8 @@ import storage from 'redux-persist/lib/storage';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import categoryReducer from './categoryReducer';
 import projectReducer from './productReducer';
+import applicationReducer from './applicationReducer';
+
 const persistConfig = {
     key: 'root',
     storage,
@@ -19,7 +21,8 @@ const persistConfig = {
 const rootReducer = {
     auth: authReducer,
     category: categoryReducer,
-    project: projectReducer
+    project: projectReducer,
+    application: applicationReducer
 };
 
 const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));

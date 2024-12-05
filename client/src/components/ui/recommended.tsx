@@ -38,7 +38,7 @@ export default function RecommendedJobs() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {allProjects.map((project: Project) => (
                     <div
-                     
+                    key={project._id}
                         className={`bg-blue-300 p-6 rounded-lg shadow-md transform transition duration-200 hover:scale-105`}
                     >
                         {/* <div className="text-sm text-gray-500 font-mono mb-2">{job.date}</div> */}

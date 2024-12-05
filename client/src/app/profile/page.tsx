@@ -1,47 +1,112 @@
 "use client";
-import React, { useState } from 'react';
-import Footer from '../../components/ui/footer';
+import React, { useEffect, useState } from 'react';
 import { 
-  User, Mail, Briefcase, MapPin, Calendar, Edit2, 
-  Bell, Check, X, ExternalLink, Github, Linkedin,
-  BookOpen, Clock, Heart, Star
+  User, Mail, Briefcase, MapPin, Bell, Check, X, Users, Tag
 } from 'lucide-react';
-import { NotificationType, ProjectType, UserInfoType } from '@/types/Profile';
-import { div } from 'framer-motion/client';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { fetchApplications, updateApplicationStatus } from '@/redux/applicationReducer';
 
+export type ProjectType = {
+  _id: string;
+  title: string;
+  description: string;
+  duration: string;
+  organizationName?: string;
+  location?: string;
+  volunteerCount: number;
+  contactEmail?: string;
+  requiredSkills?: string[];
+  userId?: string;
+  type?: 'applied' | 'accepted';
+};
 
-const UserProfile = () => {
+export type NotificationType = {
+  id: number;
+  type: 'application' | 'message';
+  message: string;
+  time: string;
+  isNew: boolean;
+};
+
+const ProjectCard: React.FC<{ project: ProjectType }> = ({ project }) => {
+
+  
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 mb-4 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+      <div className="flex justify-between items-start mb-4">
+        <h2 className="text-xl font-bold text-gray-800">{project.title}</h2>
+        <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
+          {project.duration}
+        </span>
+      </div>
+
+      <p className="text-gray-600 mb-4">{project.description}</p>
+
+      <div className="space-y-2">
+        {project.organizationName && (
+          <div className="flex items-center text-gray-500">
+            <Briefcase className="mr-2 w-4 h-4" />
+            <span>{project.organizationName}</span>
+          </div>
+        )}
+
+        {project.location && (
+          <div className="flex items-center text-gray-500">
+            <MapPin className="mr-2 w-4 h-4" />
+            <span>{project.location}</span>
+          </div>
+        )}
+
+        {project.volunteerCount > 0 && (
+          <div className="flex items-center text-gray-500">
+            <Users className="mr-2 w-4 h-4" />
+            <span>{project.volunteerCount} Volunteers Needed</span>
+          </div>
+        )}
+
+        {project.contactEmail && (
+          <div className="flex items-center text-gray-500">
+            <Mail className="mr-2 w-4 h-4" />
+            <span>{project.contactEmail}</span>
+          </div>
+        )}
+
+        {project.requiredSkills && project.requiredSkills.length > 0 && (
+          <div className="flex items-center text-gray-500">
+            <Tag className="mr-2 w-4 h-4" />
+            <span>{project.requiredSkills.join(', ')}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'projects' | 'applications' | 'accepted'>('projects');
-  const [isEditing, setIsEdititng] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated, error, user } = useAppSelector((state) => state.auth);
-  console.log('user is ', user);
+  const { projects } = useAppSelector((state) => state.project);
+  const {  applications  } = useAppSelector((state) => state.application);
+  console.log('this is the applicaitons : ', applications);
+   
+  useEffect(() => {
+    dispatch(fetchApplications(projects));
+  }, [dispatch, projects]);
 
-  const projects: ProjectType[] = [
-    {
-      id: 1,
-      title: "Tech Community Platform",
-      description: "A platform for connecting developers and sharing resources",
-      status: "active",
-      type: "created",
-      volunteers: 5,
-    },
-    {
-      id: 2,
-      title: "Environmental Data Visualization",
-      description: "Visualizing climate change data for public awareness",
-      status: "applied",
-      type: "applied",
-    },
-    {
-      id: 3,
-      title: "Education Portal",
-      description: "Online learning platform for underprivileged students",
-      status: "accepted",
-      type: "accepted",
-    },
-  ];
+  const handleStatusUpdate = (applicationId: string, status: 'Accepted' | 'Rejected') => {
+    dispatch(updateApplicationStatus({ applicationId, status }));
+  };
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  const allProjects = projects.data || [];
+  console.log('all the projects:', allProjects);
+  const userId = user?.user?.id;
+  
   const notifications: NotificationType[] = [
     {
       id: 1,
@@ -59,18 +124,24 @@ const UserProfile = () => {
     },
   ];
 
-  const handleEditToggle = () => setIsEdititng(!isEditing);
+  const handleEditToggle = () => setIsEditing(!isEditing);
 
-  const filteredProjects =  projects.filter((project) => {
-    if(activeTab === "projects") return project.type === "created";
-    if(activeTab === "applications") return project.type === "applied";
-    return project.type === "accepted";
+  const filteredProjects = allProjects.filter((project) => {
+    switch(activeTab) {
+      case 'projects':
+        return project.userId === userId;
+      case 'applications':
+        return project.type === "applied";
+      case 'accepted':
+        return project.type === "accepted";
+      default:
+        return false;
+    }
   });
 
   return (
-    
-    <div className="min-h-screnn bg-gray-50 min-h-screen">
-      <div className="bg-white shadow-sm-sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex-1">
@@ -88,21 +159,18 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
-      {showNotification ? (
-            <div>
-      <div className="fixed right-0 mt-2 bg-white rounded-lg shadow-xl z-50 mr-10">
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Notificatioins</h3>
-            <button 
-              onClick={() => setShowNotification(false)}>
 
-            <X className="h-5 w-5 text-gray-500" />
-              
-            </button>
-          </div>
-          
-          {notifications.map((notification) => (
+      {showNotification && (
+        <div className="fixed right-0 mt-2 bg-white rounded-lg shadow-xl z-50 mr-10">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Notifications</h3>
+              <button onClick={() => setShowNotification(false)}>
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            
+            {notifications.map((notification) => (
               <div
                 key={notification.id}
                 className={`p-3 rounded-lg ${
@@ -124,27 +192,16 @@ const UserProfile = () => {
                 </div>
               </div>
             ))}
-            </div> 
-        </div> 
-      </div> ) : ('' )}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* User Info */}
-        <div className="flex flex-col space-y-4 mb-6">
-          {/* <div className="flex items-center space-x-4">
-            <User className="h-6 w-6 text-gray-600" />
-            <p className="text-lg font-semibold">{userInfo.name}</p>
-          </div> */}
-          <div className="flex items-center space-x-4">
-            <Mail className="h-6 w-6 text-gray-600" />
-            {/* <p>{user?.user?.email}</p> */}
           </div>
-          {/* <div className="flex items-center space-x-4">
-            <MapPin className="h-6 w-6 text-gray-600" />
-            <p>{userInfo.location}</p>
-          </div> */}
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex items-center space-x-4 mb-6">
+          <Mail className="h-6 w-6 text-gray-600" />
+          <p>{user?.user?.email}</p>
         </div>
 
-        {/* Tabs */}
         <div className="flex space-x-4 justify-between border-b pb-2 mb-4">
           <button
             className={`${
@@ -172,32 +229,28 @@ const UserProfile = () => {
           </button>
         </div>
 
-        {/* Projects */}
-        <div className="grid gap-4">
+        <div className="max-w-4xl mx-auto p-4">
           {filteredProjects.map((project) => (
-            <div key={project.id}>
-              <div>
-                <h3 className="font-semibold text-lg">{project.title}</h3>
-                <p>{project.description}</p>
-                {project.volunteers && (
-                  <div className="text-sm text-gray-500">
-                    Volunteers: {project.volunteers}
-                  </div>
-                )}
-              </div>
-            </div>
+            <ProjectCard key={project._id} project={project} />
+            
           ))}
-        </div>
-        {/* <Footer /> */}
-      </div>
-     
-    </div>
-    
-     
-     
 
-  
-  )
-}
+{applications.map((application) => (
+        <div key={application.id}>
+          <p>{application.userName}</p>
+          <p>Status: {application.status}</p>
+          <button onClick={() => handleStatusUpdate(application.id, 'Accepted')}>Accept</button>
+          <button onClick={() => handleStatusUpdate(application.id, 'Rejected')}>Reject</button>
+        </div>
+      ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default UserProfile;
+
+function dispatch(arg0: any) {
+  throw new Error('Function not implemented.');
+}
