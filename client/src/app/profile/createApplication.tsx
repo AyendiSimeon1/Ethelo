@@ -9,10 +9,13 @@ type CreateApplicationProps = {
 };
 
 const CreateApplication: React.FC<CreateApplicationProps> = ({ projectId }) => {
+
+
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     userName: '',
     userEmail: '',
+    projectId: projectId || '',
     phone: '',
     address: '',
     age: '',
@@ -41,6 +44,7 @@ const CreateApplication: React.FC<CreateApplicationProps> = ({ projectId }) => {
       setFormData({
         userName: '',
         userEmail: '',
+        projectId: projectId || '',
         phone: '',
         address: '',
         age: '',

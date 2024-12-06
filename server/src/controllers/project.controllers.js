@@ -1,4 +1,4 @@
-const { Project, Category } = require('../models/project.models');
+const { Project, Category, Application } = require('../models/project.models');
 
 
 
@@ -215,12 +215,12 @@ const allApplications = async (req, res) => {
 // Add a new application
 const createApplication = async (req, res) => {
     try {
-        const { userName, userEmail, projectId } = req.body;
-        const newApplication = new Application({ userName, userEmail, projectId });
+        const { userName, userEmail, projectId, phone, address, age, skills, motivation, experience, status, appliedOn } = req.body;
+        const newApplication = new Application({ userName, userEmail, projectId, phone, address, age, skills, motivation, experience, status, appliedOn });
         await newApplication.save();
         res.status(201).json({ message: 'Application created', application: newApplication });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating application', error });
+        res.status(500).json(error );
     }
 };
 

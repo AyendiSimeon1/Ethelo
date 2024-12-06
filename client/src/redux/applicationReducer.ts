@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+const baseUrl = 'http://localhost:4000';
+
 export type ApplicationType = {
   id: string;
   userName: string;
@@ -28,12 +30,12 @@ const initialState: InitialStateType = {
   error: null,
 };
 
-// Fetch applications for a specific project
+
 export const fetchApplications = createAsyncThunk(
   'applications/fetchApplications',
   async (projectId: string, thunkAPI) => {
     try {
-      const response = await axios.get(`/api/projects/${projectId}/applications`);
+      const response = await axios.get(`${baseUrl}/project/applications/${projectId}`);
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
@@ -43,22 +45,22 @@ export const fetchApplications = createAsyncThunk(
   }
 );
 
-// Create a new application
+
 export const createApplication = createAsyncThunk(
   'applications/createApplication',
   async (applicationData: Omit<ApplicationType, 'id' | 'appliedOn' | 'status'>, thunkAPI) => {
+    console.log('Thisis is the application data:', applicationData)
     try {
-      const response = await axios.post(`/api/applications`, applicationData);
+      const response = await axios.post(`${baseUrl}/project/application`, applicationData);
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Failed to create application'
+        error.response || 'Failed to create application'
       );
     }
   }
 );
 
-// Update application status
 export const updateApplicationStatus = createAsyncThunk(
   'applications/updateApplicationStatus',
   async (
@@ -82,7 +84,6 @@ const applicationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch applications
       .addCase(fetchApplications.pending, (state) => {
         state.loading = true;
         state.error = null;

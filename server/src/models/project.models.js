@@ -81,9 +81,12 @@ const applicationSchema = new mongoose.Schema({
     appliedOn: { type: Date, default: Date.now },
 });
 
+const Application = mongoose.model('Application', applicationSchema);
+
 const Project = mongoose.model('Project', ProjectSchema);
 
 module.exports = {
     Category,
-    Project
+    Project,
+    Application
 }

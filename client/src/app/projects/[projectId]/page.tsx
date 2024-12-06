@@ -3,6 +3,9 @@
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/redux/store';
+import { useParams } from 'next/navigation';
+import { fetchApplications } from '@/redux/applicationReducer';
+
 import {
     MapPin,
     Clock,
@@ -14,28 +17,43 @@ import {
 } from 'lucide-react';
 import CreateApplication from '@/app/profile/createApplication';
 
-const applications = [
-    {
-      _id: '1',
-      userName: 'John Doe',
-      userEmail: 'john@example.com',
-      status: 'Pending'
-    },
-    {
-      _id: '2',
-      userName: 'Jane Smith',
-      userEmail: 'jane@example.com',
-      status: 'Pending'
-    }
-  ];
+// const applications = [
+//     {
+//       _id: '1',
+//       userName: 'John Doe',
+//       userEmail: 'john@example.com',
+//       status: 'Pending'
+//     },
+//     {
+//       _id: '2',
+//       userName: 'Jane Smith',
+//       userEmail: 'jane@example.com',
+//       status: 'Pending'
+//     }
+//   ];
 
 const ProjectDetails = () => {
     const searchParams = useSearchParams();
-    const projectId = searchParams.get('projectId');
+    const dispatch = useAppDispatch();
+    const params = useParams<{ projectId: string }>();
+    const { applications } = useAppSelector((state) => state.application);
     const [filteredApplications, setFilteredApplications] = useState(applications);
     const [toogleApplication, setToogleApplication] = useState(false);
+    const projectId = params.projectId;
 
-  
+    
+    console.log('These are all the applicaions:', applications);
+
+    useEffect(() => {
+        try {
+            dispatch(fetchApplications(projectId));
+        } catch (dispatchError) {
+            console.log(dispatchError);
+        }
+        
+    });
+
+        console.log('This is the project ID from the URL:', params.projectId);
     const handleApplicationAction = (applicationId: any, action: string) => {
         const updatedApplications = filteredApplications.map((app: { _id: any; }) => 
             app._id === applicationId
@@ -46,14 +64,11 @@ const ProjectDetails = () => {
         setFilteredApplications(updatedApplications);
     }
 
-    // Get projects from Redux
     const { projects, isLoading, error } = useAppSelector((state) => state.project);
-  
-    
+    const allProjects =  projects.data || '';
+    console.log('all the projects:', allProjects);
 
-    const allProjects =  projects.data;
-
-    const project = allProjects.find((proj: any) => allProjects.id == projectId)
+    const project = allProjects.find((proj: any) => proj._id == projectId)
     console.log('this is the project:', project);
     // Loading state
     if (isLoading) {
@@ -180,3 +195,7 @@ const ProjectDetails = () => {
 };
 
 export default ProjectDetails;
+
+function dispatch() {
+    throw new Error('Function not implemented.');
+}

@@ -1,12 +1,14 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { 
-  User, Mail, Briefcase, MapPin, Bell, Check, X, Users, Tag
+  User, Mail, Briefcase, MapPin, Bell, Check, X, Users, Tag, FileText, Clock, ExternalLink 
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { fetchApplications, updateApplicationStatus } from '@/redux/applicationReducer';
+import { getProject } from '@/redux/productReducer';
 
-export type ProjectType = {
+type ProjectType = {
   _id: string;
   title: string;
   description: string;
@@ -17,240 +19,259 @@ export type ProjectType = {
   contactEmail?: string;
   requiredSkills?: string[];
   userId?: string;
-  type?: 'applied' | 'accepted';
 };
 
-export type NotificationType = {
-  id: number;
-  type: 'application' | 'message';
-  message: string;
-  time: string;
-  isNew: boolean;
+type ApplicationType = {
+  id: string;
+  userName: string;
+  userEmail: string;
+  projectTitle: string;
+  projectId: string;
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  appliedOn: string;
 };
 
-const ProjectCard: React.FC<{ project: ProjectType }> = ({ project }) => {
+const ProjectCard: React.FC<{ 
+  project: ProjectType, 
+  applicationStatus?: 'Pending' | 'Accepted' | 'Rejected',
+  application?: ApplicationType,
+  onAccept?: () => void,
+  onReject?: () => void
+}> = ({ 
+  project, 
+  applicationStatus, 
+  application,
+  onAccept,
+  onReject
+}) => {
+  const getStatusColor = () => {
+    switch (applicationStatus) {
+      case 'Pending': return 'bg-yellow-50 text-yellow-600';
+      case 'Accepted': return 'bg-green-50 text-green-600';
+      case 'Rejected': return 'bg-red-50 text-red-600';
+      default: return '';
+    }
+  };
 
-  
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-4 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-xl font-bold text-gray-800">{project.title}</h2>
-        <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
-          {project.duration}
-        </span>
+        <div className="flex items-center space-x-2">
+          <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
+            {project.duration}
+          </span>
+          {applicationStatus && (
+            <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor()}`}>
+              {applicationStatus}
+            </span>
+          )}
+        </div>
       </div>
-
       <p className="text-gray-600 mb-4">{project.description}</p>
-
-      <div className="space-y-2">
-        {project.organizationName && (
+      
+      {application && (
+        <div className="mt-4 space-y-2 border-t pt-4">
           <div className="flex items-center text-gray-500">
-            <Briefcase className="mr-2 w-4 h-4" />
-            <span>{project.organizationName}</span>
+            <User className="mr-2 w-4 h-4" />
+            <span>{application.userName}</span>
           </div>
-        )}
-
-        {project.location && (
-          <div className="flex items-center text-gray-500">
-            <MapPin className="mr-2 w-4 h-4" />
-            <span>{project.location}</span>
-          </div>
-        )}
-
-        {project.volunteerCount > 0 && (
-          <div className="flex items-center text-gray-500">
-            <Users className="mr-2 w-4 h-4" />
-            <span>{project.volunteerCount} Volunteers Needed</span>
-          </div>
-        )}
-
-        {project.contactEmail && (
           <div className="flex items-center text-gray-500">
             <Mail className="mr-2 w-4 h-4" />
-            <span>{project.contactEmail}</span>
+            <span>{application.userEmail}</span>
           </div>
-        )}
-
-        {project.requiredSkills && project.requiredSkills.length > 0 && (
           <div className="flex items-center text-gray-500">
-            <Tag className="mr-2 w-4 h-4" />
-            <span>{project.requiredSkills.join(', ')}</span>
+            <Clock className="mr-2 w-4 h-4" />
+            <span>Applied on: {new Date(application.appliedOn).toLocaleDateString()}</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {applicationStatus === 'Pending' && (onAccept || onReject) && (
+        <div className="mt-4 flex space-x-2">
+          {onAccept && (
+            <button 
+              onClick={onAccept}
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition flex items-center"
+            >
+              <Check className="mr-2 w-4 h-4" /> Accept
+            </button>
+          )}
+          {onReject && (
+            <button 
+              onClick={onReject}
+              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition flex items-center"
+            >
+              <X className="mr-2 w-4 h-4" /> Reject
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
 const UserProfile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'projects' | 'applications' | 'accepted'>('projects');
-  const [isEditing, setIsEditing] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    'myProjects' | 
+    'pendingApplications' | 
+    'managedApplications' | 
+    'appliedProjects'
+  >('myProjects');
+  
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, error, user } = useAppSelector((state) => state.auth);
+  
+  const { user } = useAppSelector((state) => state.auth);
   const { projects } = useAppSelector((state) => state.project);
-  const {  applications  } = useAppSelector((state) => state.application);
-  console.log('this is the applicaitons : ', applications);
-   
-  useEffect(() => {
-    dispatch(fetchApplications(projects));
-  }, [dispatch, projects]);
+  const { applications } = useAppSelector((state) => state.application);
 
-  const handleStatusUpdate = (applicationId: string, status: 'Accepted' | 'Rejected') => {
+  const theProject = projects.data;
+  useEffect(() => {
+    dispatch(getProject());
+  }, [dispatch]);
+
+  const userProjects = theProject?.filter(project => project.userId === user?.user?.id) || [];
+
+  // Projects the user has applied to
+  const appliedProjectsWithStatus = applications.map(application => {
+    const project = theProject?.find(p => p._id === application.projectId);
+    return {
+      project,
+      application
+    };
+  }).filter(item => item.project && item.project.userId !== user?.user?.id);
+
+  const handleApplicationStatusUpdate = (applicationId: string, status: 'Accepted' | 'Rejected') => {
     dispatch(updateApplicationStatus({ applicationId, status }));
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  const allProjects = projects.data || [];
-  console.log('all the projects:', allProjects);
-  const userId = user?.user?.id;
-  
-  const notifications: NotificationType[] = [
-    {
-      id: 1,
-      type: "application",
-      message: "Your application for 'Education Portal' was accepted!",
-      time: "2h ago",
-      isNew: true,
-    },
-    {
-      id: 2,
-      type: "message",
-      message: "New message from Project Lead of Tech Community Platform",
-      time: "1d ago",
-      isNew: false,
-    },
-  ];
-
-  const handleEditToggle = () => setIsEditing(!isEditing);
-
-  const filteredProjects = allProjects.filter((project) => {
-    switch(activeTab) {
-      case 'projects':
-        return project.userId === userId;
-      case 'applications':
-        return project.type === "applied";
-      case 'accepted':
-        return project.type === "accepted";
-      default:
-        return false;
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'myProjects':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">My Projects</h2>
+            {userProjects.length === 0 ? (
+              <p className="text-gray-500">You haven't created any projects yet.</p>
+            ) : (
+              userProjects.map(project => (
+                <ProjectCard key={project._id} project={project} />
+              ))
+            )}
+          </div>
+        );
+      
+      case 'pendingApplications':
+        const pendingApplications = applications.filter(app => app.status === 'Pending');
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Pending Applications</h2>
+            {pendingApplications.length === 0 ? (
+              <p className="text-gray-500">No pending applications.</p>
+            ) : (
+              pendingApplications.map(application => {
+                const project = theProject.find(p => p._id === application.projectId);
+                return project ? (
+                  <ProjectCard 
+                    key={application.id}
+                    project={project}
+                    application={application}
+                    applicationStatus={application.status}
+                    onAccept={() => handleApplicationStatusUpdate(application.id, 'Accepted')}
+                    onReject={() => handleApplicationStatusUpdate(application.id, 'Rejected')}
+                  />
+                ) : null;
+              })
+            )}
+          </div>
+        );
+      
+      case 'managedApplications':
+        const managedApplications = applications.filter(app => 
+          app.status !== 'Pending'
+        );
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Managed Applications</h2>
+            {managedApplications.length === 0 ? (
+              <p className="text-gray-500">No managed applications.</p>
+            ) : (
+              managedApplications.map(application => {
+                const project = projects.find(p => p._id === application.projectId);
+                return project ? (
+                  <ProjectCard 
+                    key={application.id}
+                    project={project}
+                    application={application}
+                    applicationStatus={application.status}
+                  />
+                ) : null;
+              })
+            )}
+          </div>
+        );
+      
+      case 'appliedProjects':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Projects I've Applied To</h2>
+            {appliedProjectsWithStatus.length === 0 ? (
+              <p className="text-gray-500">You haven't applied to any projects yet.</p>
+            ) : (
+              appliedProjectsWithStatus.map(({ project, application }) => (
+                project && (
+                  <ProjectCard 
+                    key={project._id} 
+                    project={project} 
+                    application={application}
+                    applicationStatus={application.status}
+                  />
+                )
+              ))
+            )}
+          </div>
+        );
     }
-  });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">My Dashboard</h1>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div className="flex items-center mb-8">
+          <User className="h-12 w-12 text-gray-600 mr-4" />
+          <div>
+            <h1 className="text-3xl font-bold">{user?.user?.name}</h1>
+            <p className="text-gray-500 flex items-center">
+              <Mail className="h-4 w-4 mr-2" /> {user?.user?.email}
+            </p>
+          </div>
+        </div>
+
+        <div className="border-b mb-6 flex space-x-4">
+          {[
+            { key: 'myProjects', label: 'My Projects' },
+            { key: 'pendingApplications', label: 'Pending Applications' },
+            { key: 'managedApplications', label: 'Managed Applications' },
+            { key: 'appliedProjects', label: 'Applied Projects' }
+          ].map(tab => (
             <button
-              onClick={() => setShowNotification(!showNotification)}
-              className='relative p-2 rounded-full hover:bg-gray-100 transition'
+              key={tab.key}
+              className={`pb-2 ${
+                activeTab === tab.key 
+                  ? 'border-b-2 border-blue-500 text-blue-600 font-semibold' 
+                  : 'text-gray-500'
+              }`}
+              onClick={() => setActiveTab(tab.key as any)}
             >
-              <Bell className="h-6 w-6 text-gray-600" />
-              {notifications.some((n) => n.isNew) && (
-                <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse" />
-              )}
+              {tab.label}
             </button>
-          </div>
-        </div>
-      </div>
-
-      {showNotification && (
-        <div className="fixed right-0 mt-2 bg-white rounded-lg shadow-xl z-50 mr-10">
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Notifications</h3>
-              <button onClick={() => setShowNotification(false)}>
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
-            </div>
-            
-            {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 rounded-lg ${
-                  notification.isNew ? "bg-blue-50" : "bg-gray-50"
-                }`}
-              >
-                <div className="flex items-start space-x-3">
-                  <div>
-                    {notification.type === "application" ? (
-                      <Check className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <Mail className="h-5 w-5 text-blue-500" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm">{notification.message}</p>
-                    <p className="text-xs text-gray-500">{notification.time}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center space-x-4 mb-6">
-          <Mail className="h-6 w-6 text-gray-600" />
-          <p>{user?.user?.email}</p>
-        </div>
-
-        <div className="flex space-x-4 justify-between border-b pb-2 mb-4">
-          <button
-            className={`${
-              activeTab === "projects" ? "font-bold text-blue-600" : "text-gray-600"
-            }`}
-            onClick={() => setActiveTab("projects")}
-          >
-            My Projects
-          </button>
-          <button
-            className={`${
-              activeTab === "applications" ? "font-bold text-blue-600" : "text-gray-600"
-            }`}
-            onClick={() => setActiveTab("applications")}
-          >
-            Applications
-          </button>
-          <button
-            className={`${
-              activeTab === "accepted" ? "font-bold text-blue-600" : "text-gray-600"
-            }`}
-            onClick={() => setActiveTab("accepted")}
-          >
-            Accepted
-          </button>
-        </div>
-
-        <div className="max-w-4xl mx-auto p-4">
-          {filteredProjects.map((project) => (
-            <ProjectCard key={project._id} project={project} />
-            
           ))}
+        </div>
 
-{applications.map((application) => (
-        <div key={application.id}>
-          <p>{application.userName}</p>
-          <p>Status: {application.status}</p>
-          <button onClick={() => handleStatusUpdate(application.id, 'Accepted')}>Accept</button>
-          <button onClick={() => handleStatusUpdate(application.id, 'Rejected')}>Reject</button>
-        </div>
-      ))}
-        </div>
+        {renderContent()}
       </div>
     </div>
   );
 };
 
 export default UserProfile;
-
-function dispatch(arg0: any) {
-  throw new Error('Function not implemented.');
-}
