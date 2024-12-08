@@ -1,43 +1,73 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  User, Mail, Briefcase, MapPin, Bell, Check, X, Users, Tag, FileText, Clock, ExternalLink 
+  User, Mail, Check, X, Clock 
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { fetchApplications, updateApplicationStatus } from '@/redux/applicationReducer';
 import { getProject } from '@/redux/productReducer';
+import Navbar from '@/components/ui/profileHeader';
+
+type ActiveTabType = 
+  | 'myProjects' 
+  | 'pendingApplications' 
+  | 'managedApplications' 
+  | 'appliedProjects';
+
+type ProjectCardProps = {
+  project: ProjectType;
+  applicationStatus?: ApplicationType['status'];
+  application?: ApplicationType;
+  onAccept?: () => void;
+  onReject?: () => void;
+};
 
 type ProjectType = {
   _id: string;
   title: string;
-  description: string;
-  duration: string;
+  description?: string;
+  duration?: string;
   organizationName?: string;
   location?: string;
-  volunteerCount: number;
+  volunteerCount?: number;
   contactEmail?: string;
   requiredSkills?: string[];
-  userId?: string;
+  userId: string;
 };
 
 type ApplicationType = {
+  userName: React.ReactNode;
+  userEmail: React.ReactNode;
+  appliedOn: string | number | Date;
   id: string;
-  userName: string;
-  userEmail: string;
-  projectTitle: string;
   projectId: string;
   status: 'Pending' | 'Accepted' | 'Rejected';
-  appliedOn: string;
 };
 
-const ProjectCard: React.FC<{ 
-  project: ProjectType, 
-  applicationStatus?: 'Pending' | 'Accepted' | 'Rejected',
-  application?: ApplicationType,
-  onAccept?: () => void,
-  onReject?: () => void
-}> = ({ 
+type UserType = {
+  id?: string;
+  [key: string]: any;
+};
+
+type ProjectState = {
+  data: ProjectType[];
+  loading: boolean;
+  error: string | null;
+};
+
+type ApplicationState = {
+  applications: ApplicationType[];
+  loading: boolean;
+  error: string | null;
+};
+
+type ProjectApplicationPair = {
+  project: ProjectType | undefined;
+  application: ApplicationType;
+};
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
   applicationStatus, 
   application,
@@ -54,7 +84,10 @@ const ProjectCard: React.FC<{
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-4 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+    <div 
+      className="bg-white shadow-md rounded-lg p-6 mb-4 border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+      role="article"
+    >
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-xl font-bold text-gray-800">{project.title}</h2>
         <div className="flex items-center space-x-2">
@@ -92,6 +125,7 @@ const ProjectCard: React.FC<{
           {onAccept && (
             <button 
               onClick={onAccept}
+              aria-label="Accept Application"
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition flex items-center"
             >
               <Check className="mr-2 w-4 h-4" /> Accept
@@ -100,6 +134,7 @@ const ProjectCard: React.FC<{
           {onReject && (
             <button 
               onClick={onReject}
+              aria-label="Reject Application"
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition flex items-center"
             >
               <X className="mr-2 w-4 h-4" /> Reject
@@ -112,65 +147,78 @@ const ProjectCard: React.FC<{
 };
 
 const UserProfile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    'myProjects' | 
-    'pendingApplications' | 
-    'managedApplications' | 
-    'appliedProjects'
-  >('myProjects');
-  
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('myProjects');
   const dispatch = useAppDispatch();
-  
-  const { user } = useAppSelector((state) => state.auth);
-  const { projects } = useAppSelector((state) => state.project);
-  const { applications } = useAppSelector((state) => state.application);
 
-  const theProject = projects.data;
+  const { projects, loading: projectsLoading, error: projectsError } = 
+    useAppSelector((state) => state.project);
+  const { 
+    applications, 
+    loading: applicationsLoading, 
+    error: applicationsError 
+  } = useAppSelector((state) => state.application);
+  const { user } = useAppSelector((state) => state.auth) as { user?: UserType };
+
   useEffect(() => {
-    dispatch(getProject());
-  }, [dispatch]);
+    if (user?.id) {
+      dispatch(fetchApplications(user.id));
+      dispatch(getProject());
+    }
+  }, [dispatch, user?.id]);
 
-  const userProjects = theProject?.filter(project => project.userId === user?.user?.id) || [];
+  const userProjects = useMemo(() => 
+    projects.data?.filter((project: ProjectType) => project.userId === user?.id) || [], 
+    [projects.data, user]
+  );
 
-  // Projects the user has applied to
-  const appliedProjectsWithStatus = applications.map(application => {
-    const project = theProject?.find(p => p._id === application.projectId);
-    return {
-      project,
-      application
-    };
-  }).filter(item => item.project && item.project.userId !== user?.user?.id);
+  const appliedProjectsWithStatus = useMemo((): ProjectApplicationPair[] => 
+    applications.map((application: ApplicationType): ProjectApplicationPair => {
+      const project = projects.data?.find((p: ProjectType) => p._id === application.projectId);
+      return { project, application };
+    }).filter((item: ProjectApplicationPair) => 
+      item.project && item.project.userId !== user?.id
+    ),
+    [applications, projects.data, user]
+  );
 
   const handleApplicationStatusUpdate = (applicationId: string, status: 'Accepted' | 'Rejected') => {
     dispatch(updateApplicationStatus({ applicationId, status }));
   };
 
   const renderContent = () => {
+    if (projectsLoading || applicationsLoading) {
+      return <div className="text-center text-gray-500 py-8">Loading...</div>;
+    }
+
+    if (projectsError || applicationsError) {
+      return <div className="text-center text-red-500 py-8">Error loading data</div>;
+    }
+
     switch (activeTab) {
       case 'myProjects':
         return (
           <div>
             <h2 className="text-2xl font-bold mb-4">My Projects</h2>
-            {userProjects.length === 0 ? (
+            {projects.data.length === 0 ? (
               <p className="text-gray-500">You haven't created any projects yet.</p>
             ) : (
-              userProjects.map(project => (
+              projects.data.map((project: ProjectType) => (
                 <ProjectCard key={project._id} project={project} />
               ))
             )}
           </div>
         );
-      
+
       case 'pendingApplications':
-        const pendingApplications = applications.filter(app => app.status === 'Pending');
+        const pendingApplications = applications.filter((app: ApplicationType) => app.status === 'Pending');
         return (
           <div>
             <h2 className="text-2xl font-bold mb-4">Pending Applications</h2>
             {pendingApplications.length === 0 ? (
               <p className="text-gray-500">No pending applications.</p>
             ) : (
-              pendingApplications.map(application => {
-                const project = theProject.find(p => p._id === application.projectId);
+              pendingApplications.map((application: ApplicationType) => {
+                const project = projects.data?.find((p: ProjectType) => p._id === application.projectId);
                 return project ? (
                   <ProjectCard 
                     key={application.id}
@@ -185,32 +233,7 @@ const UserProfile: React.FC = () => {
             )}
           </div>
         );
-      
-      case 'managedApplications':
-        const managedApplications = applications.filter(app => 
-          app.status !== 'Pending'
-        );
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Managed Applications</h2>
-            {managedApplications.length === 0 ? (
-              <p className="text-gray-500">No managed applications.</p>
-            ) : (
-              managedApplications.map(application => {
-                const project = projects.find(p => p._id === application.projectId);
-                return project ? (
-                  <ProjectCard 
-                    key={application.id}
-                    project={project}
-                    application={application}
-                    applicationStatus={application.status}
-                  />
-                ) : null;
-              })
-            )}
-          </div>
-        );
-      
+
       case 'appliedProjects':
         return (
           <div>
@@ -218,56 +241,49 @@ const UserProfile: React.FC = () => {
             {appliedProjectsWithStatus.length === 0 ? (
               <p className="text-gray-500">You haven't applied to any projects yet.</p>
             ) : (
-              appliedProjectsWithStatus.map(({ project, application }) => (
-                project && (
-                  <ProjectCard 
-                    key={project._id} 
-                    project={project} 
+              appliedProjectsWithStatus.map(({ project, application }: ProjectApplicationPair) => 
+                project ? (
+                  <ProjectCard
+                    key={application.id}
+                    project={project}
                     application={application}
                     applicationStatus={application.status}
                   />
-                )
-              ))
+                ) : null
+              )
             )}
           </div>
         );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <div className="flex items-center mb-8">
-          <User className="h-12 w-12 text-gray-600 mr-4" />
-          <div>
-            <h1 className="text-3xl font-bold">{user?.user?.name}</h1>
-            <p className="text-gray-500 flex items-center">
-              <Mail className="h-4 w-4 mr-2" /> {user?.user?.email}
-            </p>
-          </div>
-        </div>
-
-        <div className="border-b mb-6 flex space-x-4">
-          {[
-            { key: 'myProjects', label: 'My Projects' },
-            { key: 'pendingApplications', label: 'Pending Applications' },
-            { key: 'managedApplications', label: 'Managed Applications' },
-            { key: 'appliedProjects', label: 'Applied Projects' }
-          ].map(tab => (
+    <div>
+      <Navbar />
+      <div 
+        className="min-h-screen bg-gray-50 p-8"
+        aria-live="polite"
+      >
+        <div className="mb-4 flex space-x-4">
+          {(['myProjects', 'pendingApplications', 'appliedProjects'] as ActiveTabType[]).map(tab => (
             <button
-              key={tab.key}
-              className={`pb-2 ${
-                activeTab === tab.key 
-                  ? 'border-b-2 border-blue-500 text-blue-600 font-semibold' 
-                  : 'text-gray-500'
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-md transition ${
+                activeTab === tab 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
-              onClick={() => setActiveTab(tab.key as any)}
             >
-              {tab.label}
+              {tab === 'myProjects' ? 'My Projects' : 
+               tab === 'pendingApplications' ? 'Pending Applications' : 
+               'Applied Projects'}
             </button>
           ))}
         </div>
-
         {renderContent()}
       </div>
     </div>

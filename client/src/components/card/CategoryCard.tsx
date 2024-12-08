@@ -62,7 +62,7 @@ const CategoryCard = () => {
 
   return (
     <div className="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {categories.map((category, index) => {
+      {categories.map((category: { icon: string | number; id: React.Key | null | undefined; title: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }, index: any) => {
         const Icon = iconMapping[category.icon] || Palette;
         
         console.log(`🏷️ Rendering Category ${index}:`, category);

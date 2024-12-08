@@ -5,7 +5,8 @@ import { createProject } from '@/redux/productReducer';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { title } from 'process';
 
-interface Project {
+interface Project { 
+  _id? : string;
   title: string;
   userId: string;
   description: string;
@@ -131,10 +132,10 @@ const ProjectPostingForm: React.FC = () => {
     return state.category;
   });
   const userId = useAppSelector((state) => {
-    return state.auth.user?.user?.id;
+    return (state.auth.user as any)?.user?.id;
+
   });
 
-  console.log('This is the user id:', userId);
   
   const transformedCategories = categories.map((category: { id: string; title: string; }) => ({
     value: category.id,

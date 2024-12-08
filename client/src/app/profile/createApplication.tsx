@@ -35,7 +35,7 @@ const CreateApplication: React.FC<CreateApplicationProps> = ({ projectId }) => {
       ...formData,
       age: parseInt(formData.age, 10),
       skills: formData.skills.split(',').map((skill) => skill.trim()),
-      projectId,
+      projectId: projectId ?? '',  // Ensures projectId is always a string
     };
 
     try {

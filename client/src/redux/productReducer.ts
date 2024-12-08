@@ -4,7 +4,7 @@ import axios from 'axios';
 const baseUrl = "http://localhost:4000";
 
 export interface Project {
-    _id: any;
+    _id?: string;
     id?: string;
     title?: string;
     description?: string;
@@ -82,7 +82,13 @@ export const deleteProject = createAsyncThunk(
 const projectSlice = createSlice({
     name: 'project',
     initialState,
-    reducers: {},
+    reducers: {
+        logout: (state) => {
+            state.projects = null;
+            state.isLoading = false;
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getProject.pending, (state) => {
@@ -117,7 +123,7 @@ const projectSlice = createSlice({
                 if (state.projects) {
                     const index = state.projects.findIndex(project => project.id === action.payload.id);
                     if (index !== -1) {
-                        state.projects[index] = action.payload.data; // Update the project in place
+                        state.projects[index] = action.payload.data;
                     }
                 }
                 state.error = null;
@@ -143,4 +149,5 @@ const projectSlice = createSlice({
     }
 });
 
+export const { logout } = projectSlice.actions;
 export default projectSlice.reducer;

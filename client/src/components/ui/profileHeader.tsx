@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Bell, Navigation, Settings, User } from 'lucide-react';
 import { useAppSelector } from '@/redux/store';
+import { logout } from '@/redux/authReducer';
 
 const Navbar = () => {
   const [activeTab, setActiveTab] = React.useState('jobs');
@@ -13,6 +14,12 @@ const Navbar = () => {
     { id: 'About ', label: 'About' },
     { id: 'faq', label: 'FAQ' },
   ];
+  const handleLogout = async () => {
+    console.log('the stuff is dispatching');
+
+    await dispatch(logout());
+
+    };
 
   return (
     <nav className="w-full bg-gray-800 border-b border-white/20">
@@ -35,18 +42,18 @@ const Navbar = () => {
                 <button 
                   className='text-white bg-blue-700 px-3 font-mono py-2  rounded'
                   >
-                    Dashboard
+                    Logout
                   </button>
                 </Link>
             ) :
             (
-              <Link href='/signup'>
-              <button 
+              
+              <button onClick={handleLogout}
                 className='text-white bg-blue-700 px-3 font-mono py-2  rounded'
                 >
                   Signup
                 </button>
-              </Link>
+           
             )
           }
             
@@ -58,3 +65,7 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+function dispatch(arg0: any) {
+    throw new Error('Function not implemented.');
+}

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/redux/store';
 import { useParams } from 'next/navigation';
 import { fetchApplications } from '@/redux/applicationReducer';
+import Navbar from '../../../components/ui/header';
 
 import {
     MapPin,
@@ -16,21 +17,6 @@ import {
     Ship
 } from 'lucide-react';
 import CreateApplication from '@/app/profile/createApplication';
-
-// const applications = [
-//     {
-//       _id: '1',
-//       userName: 'John Doe',
-//       userEmail: 'john@example.com',
-//       status: 'Pending'
-//     },
-//     {
-//       _id: '2',
-//       userName: 'Jane Smith',
-//       userEmail: 'jane@example.com',
-//       status: 'Pending'
-//     }
-//   ];
 
 const ProjectDetails = () => {
     const searchParams = useSearchParams();
@@ -81,7 +67,10 @@ const ProjectDetails = () => {
     }
 
     return (
+        <div>
+        <Navbar />
         <div className='container mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6'>
+            
             <div className='md:col-span-2 bg-white shadow-lg rounded-lg p-6'>
                 <h4 className='font-bold text-2xl text-gray-900'>{project.title}</h4>
                 <button className='text-white bg-green-500' onClick={() => setToogleApplication(true)}>
@@ -136,7 +125,7 @@ const ProjectDetails = () => {
                         </p>
                     ) : (
                         <div className="space-y-4">
-                            {filteredApplications.map((application) => (
+                            {filteredApplications.map((application: { _id: Key | null | undefined; userName: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; userEmail: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; status: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<AwaitedReactNode> | null | undefined; }) => (
                                 <div key={application._id} className="border p-4 rounded-lg">
                                     <div className="flex justify-between items-center">
                                         <div>
@@ -190,6 +179,7 @@ const ProjectDetails = () => {
              
             }
            
+        </div>
         </div>
     );
 };

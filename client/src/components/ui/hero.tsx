@@ -55,24 +55,6 @@ const Hero: React.FC =  () => {
               Join thousands making an impact.
             </motion.p>
           </div>
-
-          <div className="flex space-x-4">
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:shadow-lg hover:from-green-700 hover:to-green-600 transition-all text-base font-semibold outline-none focus:ring-4 focus:ring-green-500/20"
-      >
-        <Link href="/signup">Signup</Link>
-      </motion.button>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all text-base font-semibold outline-none focus:ring-4 focus:ring-blue-500/20"
-      >
-        <Link href="/dashboard">Dashboard</Link>
-      </motion.button>
-    </div>
-
           
         </motion.div>
       </div>

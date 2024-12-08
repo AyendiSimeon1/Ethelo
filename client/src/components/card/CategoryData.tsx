@@ -1,5 +1,4 @@
-import  CategoryCard  from '@/components/card/CategoryCard';
-import  { CategoryGrid }  from '@/components/card/CategoryGrid';
+
 import getCategories from '@/utils/db';
 
 export default  function Cat() {
@@ -7,7 +6,7 @@ export default  function Cat() {
     
     return (
       <main className="container mx-auto py-8">
-        <CategoryGrid categories={categories} />
+      <h1>Hi</h1>
       </main>
     );
   }
